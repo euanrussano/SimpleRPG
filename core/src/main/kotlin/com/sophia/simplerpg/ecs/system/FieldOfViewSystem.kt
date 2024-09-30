@@ -10,8 +10,10 @@ import com.sophia.simplerpg.ecs.component.*
 import ktx.ashley.allOf
 import ktx.ashley.get
 import ktx.ashley.onEntityAdded
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 class FieldOfViewSystem : EntitySystem(), EntityListener {
 
@@ -72,29 +74,45 @@ class FieldOfViewSystem : EntitySystem(), EntityListener {
         startVec.set(startX + 0.5f, startY + 0.5f) // Center of the start tile
         endVec.set(endX + 0.5f, endY + 0.5f)         // Center of the end tile
 
-        val minX = min(startX, endX)
-        val minY = min(startY, endY)
-        val maxX = max(startX, endX)
-        val maxY = max(startY, endY)
+        // Bresenham's Line Algorithm to walk through all grid tiles along the line
+        var x = startX
+        var y = startY
+        val dx = abs(endX - startX)
+        val dy = abs(endY - startY)
+        val sx = if (startX < endX) 1 else -1
+        val sy = if (startY < endY) 1 else -1
+        var err = dx - dy
 
-        for (x in minX..maxX) {
-            for (y in minY..maxY) {
-                if (x == endX && y == endY) continue
-                val tile = tilemap.getOrNull(x)?.getOrNull(y)?: continue
+        while (true) {
+            // Skip the check if we're at the end position
+            if (x == endX && y == endY) break
 
-                if (tile == Terrain.FLOOR) continue
+            // Check the current tile (x, y) to see if it's blocking
+            val tile = tilemap.getOrNull(x)?.getOrNull(y)
+            if (tile != null && tile != Terrain.FLOOR) {
+                // Perform an intersection test with the circle around the tile
+                val centerVec = centerVec.set(x + 0.5f, y + 0.5f)
+                if (Intersector.intersectSegmentCircle(startVec, endVec, centerVec, 0.25f)) {
+                    return true // Blocked by this tile
+                }
+            }
 
-                if (Intersector.intersectSegmentCircle(
-                    startVec,
-                    endVec,
-                    centerVec.set(x+0.5f, y + 0.5f),
-                    0.25f
-                )) return true
+            // If we've reached the end tile, break the loop
+            if (x == endX && y == endY) break
+
+            // Move to the next tile along the line
+            val e2 = 2 * err
+            if (e2 > -dy) {
+                err -= dy
+                x += sx
+            }
+            if (e2 < dx) {
+                err += dx
+                y += sy
             }
         }
 
-        return false
-
+        return false // No blocking tiles found
     }
 
     override fun entityAdded(entity: Entity) {
