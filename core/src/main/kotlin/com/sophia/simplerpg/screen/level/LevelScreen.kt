@@ -43,6 +43,7 @@ class LevelScreen(val game: SimpleRPG): KtxScreen {
             addSystem(HeroSpawnSystem())
             addSystem(PlayerMovementSystem(keyboardController))
             addSystem(RandomMovementSystem())
+            addSystem(AnimalAISystem())
 
             addSystem(MovementSystem())
             addSystem(FieldOfViewSystem())

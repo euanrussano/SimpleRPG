@@ -30,7 +30,12 @@ class RoomsAndCorridorsGenerator : MapGenerator() {
         // Place additional entities in the other rooms
         rooms.drop(1).withIndex().forEach { (i, rec) ->
             val (x, y) = rec.center()
-            EntityFactory.animal(engine, globalX, globalY, depth, x, y)
+            if (MathUtils.randomBoolean()) {
+                EntityFactory.rat(engine, globalX, globalY, depth, x, y)
+            } else{
+                EntityFactory.bat(engine, globalX, globalY, depth, x, y)
+            }
+
         }
     }
 

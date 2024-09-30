@@ -1,6 +1,7 @@
 package com.sophia.simplerpg.mapgenerator
 
 import com.badlogic.ashley.core.Engine
+import com.badlogic.gdx.math.MathUtils
 import com.sophia.simplerpg.ecs.component.GlobalPosition
 import com.sophia.simplerpg.ecs.component.Position
 import com.sophia.simplerpg.ecs.component.Spawn
@@ -36,7 +37,12 @@ class SimpleMapGenerator: MapGenerator() {
 
     override fun placeEntities(engine: Engine, tiles: Array<Array<Int>>, globalX: Int, globalY: Int, depth: Int, width: Int, height: Int) {
         (0..5).forEach { i ->
-            EntityFactory.animal(engine, globalX, globalY, depth,i*2+1, 4)
+            if (MathUtils.randomBoolean()){
+                EntityFactory.bat(engine, globalX, globalY, depth,i*2+1, 4)
+            } else {
+                EntityFactory.rat(engine, globalX, globalY, depth,i*2+1, 4)
+            }
+
         }
     }
 

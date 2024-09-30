@@ -9,6 +9,9 @@ import ktx.ashley.with
 object EntityFactory {
     fun hero(engine: Engine, globalX: Int, globalY: Int, x: Int, y: Int) {
         engine.entity {
+            with<Name>{
+                name = "Hero"
+            }
             with<Position> {
                 this.x = x
                 this.y = y
@@ -31,8 +34,16 @@ object EntityFactory {
         }
     }
 
-    fun animal(engine: Engine, globalX: Int, globalY: Int, depth: Int, x: Int, y: Int) {
+    // Bat flee from hero
+    fun bat(engine: Engine, globalX: Int, globalY: Int, depth: Int, x: Int, y: Int) = animal(engine, globalX, globalY, depth, x, y, "B", Color.BLUE, "Bat")
+
+    // Rat is curious toward the hero
+    fun rat(engine: Engine, globalX: Int, globalY: Int, depth: Int, x: Int, y: Int) = animal(engine, globalX, globalY, depth, x, y, "R", Color.RED, "Rat")
+    private fun animal(engine: Engine, globalX: Int, globalY: Int, depth: Int, x: Int, y: Int, symbol: String, color: Color, name: String) {
         engine.entity {
+            with<Name>{
+                this.name = name
+            }
             with<Position>{
                 this.x = x
                 this.y = y
@@ -43,14 +54,15 @@ object EntityFactory {
                 this.depth = depth
             }
             with<Renderable>{
-                symbol = "R"
-                color = Color.RED
+                this.symbol = symbol
+                this.color = color
             }
             with<RandomMovement>()
             with<Collision>()
             with<FieldOfView>{
                 range = 4
             }
+            with<Animal>{}
         }
     }
 
